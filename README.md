@@ -1,90 +1,147 @@
-[![Java CI with Maven](https://github.com/Yashmerino/ecommerce-platform/actions/workflows/maven.yml/badge.svg)](https://github.com/Yashmerino/ecommerce-platform/actions/workflows/maven.yml) [![Node.js CI](https://github.com/Yashmerino/ecommerce-platform/actions/workflows/node.js.yml/badge.svg)](https://github.com/Yashmerino/ecommerce-platform/actions/workflows/node.js.yml) [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=Yashmerino_ecommerce-platform&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=Yashmerino_ecommerce-platform)
+# E-commerce Platform
 
-<h1 align="center"><strong><em>Ecommerce Platform</strong></em></h1>
-  
-[![YouTube Showcase Video of the project](demo/thumbnail.png)](https://youtu.be/JQikf8Uf4zU)
+A pet project demonstrating an e-commerce platform built with a microservices architecture using Spring Boot and React. The platform separates core e-commerce functionality, payment processing, and notifications into independent services.
 
-Ecommerce Platform is a pet project built with a microservices architecture using Spring Boot and React. The platform includes multiple services for handling core functionality, payments, and notifications. It uses MySQL for data persistence, Kafka for event streaming, and Redis for caching. The platform features JWT-based authentication and supports 3 languages:
-* **English**
-* **Romanian**
-* **Russian**
+## Features
+
+- Product, user, and order management
+- Payment processing through a dedicated payment service
+- Notifications and messaging through a dedicated notification service
+- React-based user interface built with Vite and hot module replacement
+- JWT-based authentication
+- Multilingual support for:
+  - English
+  - Romanian
+  - Russian
 
 ## Architecture
 
-The platform consists of the following microservices:
-- **Main Server**: Core ecommerce functionality (products, users, orders)
-- **Payment Service**: Handles payment processing
-- **Notification Service**: Manages notifications and messaging
-- **UI**: React-based frontend with Vite and hot module replacement
+The project contains the following services and modules:
 
-Infrastructure components:
-- **Nginx**: Reverse proxy with rate limiting
-- **MySQL**: Primary database
-- **Kafka**: Event streaming for inter-service communication
-- **Redis**: Caching and session management
+| Module | Responsibility |
+|---|---|
+| Main Server (`ecommerce-platform-server`) | Core e-commerce functionality, including products, users, and orders |
+| Payment Service (`ecommerce-platform-payment-service`) | Handles payment processing |
+| Notification Service (`ecommerce-platform-notification-service`) | Manages notifications and messaging |
+| UI (`ecommerce-platform-ui`) | React frontend built with Vite |
+| Integration Tests (`ecommerce-platform-it`) | Selenium integration tests |
+
+### Infrastructure
+
+- **Nginx** — reverse proxy and rate limiting
+- **MySQL** — primary database
+- **Kafka** — event streaming for inter-service communication
+- **Redis** — caching and session management
 
 ## Prerequisites
 
-* Docker
-* Docker Compose
+Before starting, install:
 
-## Quick Start - Development Environment
+- [Docker](https://www.docker.com/)
+- [Docker Compose](https://docs.docker.com/compose/)
 
-The development environment includes hot reload support for all services:
+## Quick Start — Development Environment
 
-### Configuration
+The development environment uses Docker Compose and supports hot reload for the services.
 
-Before starting, configure your environment variables in `development/docker-compose.yml`:
+### 1. Configure environment variables
 
-- **JWT_SECRET**: Your secret key for JWT token generation
-- **STRIPE_API_KEY**: Your Stripe API key for payment processing
-- **Mail Properties**: SMTP configuration for email notifications
+Review `development/docker-compose.yml` and configure the required values before starting the application. These include:
+
+- `JWT_SECRET` — secret key used to generate JWT tokens
+- `STRIPE_API_KEY` — Stripe API key for payment processing
+- Mail settings for email notifications:
   - `MAIL_HOST`
   - `MAIL_PORT`
   - `MAIL_USERNAME`
   - `MAIL_PASSWORD`
 
-### Start Services
+Use your own credentials and keep secrets out of version control. Do not commit real API keys, passwords, or other sensitive values.
+
+### 2. Start the services
+
+From the repository root, run:
 
 ```bash
 cd development
-docker-compose up --build
+docker compose up --build
 ```
 
-Access the application at `http://localhost`
+Docker Compose will build and start the development services.
 
-### Development Features
+### 3. Open the application
 
-- **Hot Reload**: All Java services use Spring Boot DevTools for automatic reloading (~8-10s)
-- **Vite HMR**: Frontend updates instantly (~1s)
-- **Remote Debugging**: Port 5005 exposed for IDE debugging
-- **Volume Mounts**: Source code changes reflected immediately
+When the containers are running, access the application at:
 
-For more details, see [development/README.md](development/README.md)
+[http://localhost](http://localhost)
 
-### Stopping Services
+### 4. Stop the services
+
+To stop and remove the containers, run this from the `development` directory:
 
 ```bash
-# Stop and remove containers
-docker-compose down
-
-# Stop and remove containers + volumes (deletes DB data)
-docker-compose down -v
+docker compose down
 ```
+
+To also remove the volumes (this deletes persisted database data), run:
+
+```bash
+docker compose down -v
+```
+
+> **Warning:** `docker compose down -v` removes the associated volumes and can delete database data. Use it only when you intend to reset the development environment.
+
+## Development Features
+
+- **Spring Boot DevTools:** automatic reloading for Java services (approximately 8–10 seconds, depending on the change)
+- **Vite HMR:** frontend updates without a full page reload
+- **Remote debugging:** port `505` is exposed for IDE debugging
+- **Volume mounts:** source changes are reflected in the running development environment
+
+For additional development setup details, see [`development/README.md`](development/README.md).
 
 ## Selenium Integration Tests
 
-Ecommerce Platform includes a separate module for Selenium integration tests located in `ecommerce-platform/ecommerce-platform-it`.
+A separate module for Selenium integration tests is located at `ecommerce-platform-it`.
 
-To run integration tests:
-1. Make sure the development environment is running (`docker-compose up`)
-2. Configure `ecommerce-platform-it\src\test\resources\it-test.properties`:
+To run the integration tests:
+
+1. Start the development environment using `docker compose up`.
+2. Configure `ecommerce-platform-it/src/test/resources/it-test.properties` with the test database connection details, if required by your setup.
+3. Run the integration tests using your IDE or Maven.
+
+Example test database properties shown in the project documentation:
+
 ```properties
 db.url=jdbc:mysql://localhost:3306/ecommerce-platform
 db.username=root
 db.password=1234
 ```
 
-<b>⚠️ WARNING</b>: Integration tests will clear all existing data from your database.
+> **Warning:** Integration tests may clear existing data in the test database. Use a dedicated test database and do not run them against production or valuable local data.
 
-#### Feel free to create issues and pull requests :)
+## Repository Structure
+
+```text
+.
+├── .github/
+├── demo/
+├── development/
+├── ecommerce-platform-it/
+├── ecommerce-platform-notification-service/
+├── ecommerce-platform-payment-service/
+├── ecommerce-platform-server/
+├── ecommerce-platform-ui/
+├── .gitignore
+├── LICENSE.md
+├── pom.xml
+└── README.md
+```
+
+## Contributing
+
+Issues and pull requests are welcome. Please describe the purpose of a change and include relevant testing details when submitting a pull request.
+
+## License
+
+See [`LICENSE.md`](LICENSE.md) for license information.
